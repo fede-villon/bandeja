@@ -1,45 +1,52 @@
-"""Convierte cada archivo de entrada en bloques de contenido para la API de Claude.
+"""Convierte cada archivo de entrada en texto para el modelo.
 
-- PDF: se manda tal cual (Claude lee PDFs nativamente, incluidos escaneados).
-- Email (.eml): el cuerpo como texto y cada PDF adjunto como documento.
-- Texto (.txt): como texto.
+- PDF: se extrae el texto con pypdf. Los PDF escaneados (imágenes, sin texto)
+  no se pueden leer así: se informa para revisarlos a mano.
+- Email (.eml): encabezado, cuerpo y el texto de cada PDF adjunto.
+- Texto (.txt): tal cual.
 """
-import base64
 import email
 import hashlib
+import io
 from email import policy
 from pathlib import Path
 
+from pypdf import PdfReader
+
 EXTENSIONES = {".pdf", ".eml", ".txt"}
+MINIMO_TEXTO = 40   # menos que esto en un PDF = probablemente escaneado
+
+
+class SinTexto(Exception):
+    """El archivo no tiene texto legible (por ejemplo, un PDF escaneado)."""
 
 
 def hash_archivo(ruta: Path) -> str:
     return hashlib.sha256(ruta.read_bytes()).hexdigest()
 
 
-def _pdf(datos: bytes, titulo: str) -> dict:
-    return {
-        "type": "document",
-        "source": {"type": "base64", "media_type": "application/pdf", "data": base64.b64encode(datos).decode()},
-        "title": titulo,
-    }
+def texto_pdf(datos: bytes, nombre: str) -> str:
+    lector = PdfReader(io.BytesIO(datos))
+    texto = "\n".join((p.extract_text() or "") for p in lector.pages).strip()
+    if len(texto) < MINIMO_TEXTO:
+        raise SinTexto(f"{nombre} no tiene texto (¿está escaneado?): revisalo a mano.")
+    return texto
 
 
-def bloques_de(ruta: Path) -> list[dict]:
+def texto_de(ruta: Path) -> str:
     ext = ruta.suffix.lower()
     if ext == ".pdf":
-        return [_pdf(ruta.read_bytes(), ruta.name)]
+        return f"[Documento PDF: {ruta.name}]\n" + texto_pdf(ruta.read_bytes(), ruta.name)
     if ext == ".txt":
-        return [{"type": "text", "text": ruta.read_text(encoding="utf-8")}]
+        return ruta.read_text(encoding="utf-8")
     if ext == ".eml":
         msg = email.message_from_bytes(ruta.read_bytes(), policy=policy.default)
         cuerpo = msg.get_body(preferencelist=("plain", "html"))
-        texto = cuerpo.get_content() if cuerpo else ""
-        encabezado = f"De: {msg['From']}\nAsunto: {msg['Subject']}\nFecha: {msg['Date']}\n\n"
-        bloques = []
+        partes = [f"[Email]\nDe: {msg['From']}\nAsunto: {msg['Subject']}\nFecha: {msg['Date']}\n\n"
+                  + (cuerpo.get_content() if cuerpo else "")]
         for adj in msg.iter_attachments():
             if adj.get_content_type() == "application/pdf":
-                bloques.append(_pdf(adj.get_content(), adj.get_filename() or "adjunto.pdf"))
-        bloques.append({"type": "text", "text": "Email recibido:\n" + encabezado + texto})
-        return bloques
+                nombre = adj.get_filename() or "adjunto.pdf"
+                partes.append(f"[PDF adjunto: {nombre}]\n" + texto_pdf(adj.get_content(), nombre))
+        return "\n\n".join(partes)
     raise ValueError(f"Formato no soportado: {ruta.name}")

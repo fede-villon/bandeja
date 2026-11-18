@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS documentos (
     impuestos    REAL,
     estado       TEXT NOT NULL DEFAULT 'pendiente' CHECK (estado IN ('pendiente', 'aprobado', 'rechazado')),
     procesado    TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
-    extractor    TEXT NOT NULL,                 -- 'claude:<modelo>' o 'demo'
+    extractor    TEXT NOT NULL,                 -- 'llm:<modelo>' o 'demo'
     datos_json   TEXT NOT NULL                  -- lo extraído, completo, para auditoría
 );
 CREATE TABLE IF NOT EXISTS items (

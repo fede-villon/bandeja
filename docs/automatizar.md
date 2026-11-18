@@ -12,8 +12,7 @@
 0 9 * * 1    cd /home/usuario/bandeja && .venv/bin/python -m bandeja reporte --dias 7 --excel salida/semana.xlsx --enviar >> logs/bandeja.log 2>&1
 ```
 
-La clave de la API va en el entorno del cron. Por ejemplo, en la primera línea del crontab:
-`ANTHROPIC_API_KEY=...`, o en un archivo con permisos `600` que se carga antes del comando.
+Ollama tiene que estar corriendo (`ollama serve`; en Linux se instala como servicio y arranca solo). Para usar otro modelo, agregá al principio del crontab, por ejemplo, `BANDEJA_MODELO=qwen2.5:7b-instruct`.
 
 En Windows, lo mismo se arma con el Programador de tareas.
 
@@ -38,6 +37,7 @@ En Windows, lo mismo se arma con el Programador de tareas.
 ## Ante un error
 
 - `✗ archivo: ...` significa que el archivo no se procesó y queda en `entrada/`. Se reintenta en la próxima corrida.
-- `Límite de uso de la API alcanzado`: se reintenta solo en la próxima corrida.
-- `Sin conexión con la API`: revisar internet y proxy.
+- `No hay conexión con el modelo`: Ollama no está corriendo. Iniciarlo con `ollama serve`.
+- `El modelo … no está instalado`: descargarlo con `ollama pull <modelo>`.
+- `no tiene texto (¿está escaneado?)`: es una foto o un escaneo. Cargarlo a mano.
 - Para ver qué leyó la IA, abrir el documento en el panel → "Datos extraídos (JSON)".

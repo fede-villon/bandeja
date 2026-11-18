@@ -6,7 +6,7 @@ from datetime import date
 from pathlib import Path
 
 from . import db
-from .extraer import ExtractorClaude, ExtractorDemo
+from .extraer import ExtractorDemo, ExtractorLLM
 from .formato import pesos
 from .panel import generar_panel
 from .procesar import procesar_carpeta
@@ -40,8 +40,8 @@ def main(argv=None):
     s = sub.add_parser("procesar", help="procesa los documentos nuevos de una carpeta")
     s.add_argument("--entrada", default="entrada")
     s.add_argument("--mover", metavar="CARPETA", help="mover cada archivo procesado a esta carpeta")
-    s.add_argument("--demo", action="store_true", help="usar extracciones de ejemplo en vez de la API")
-    s.add_argument("--modelo", help="modelo de Claude (default: claude-opus-5-5 o BANDEJA_MODELO)")
+    s.add_argument("--demo", action="store_true", help="usar extracciones de ejemplo en vez del modelo")
+    s.add_argument("--modelo", help="modelo a usar (default: qwen2.5:7b-instruct en Ollama, o BANDEJA_MODELO)")
 
     s = sub.add_parser("proveedores", help="carga el padrón de proveedores habituales desde un CSV nombre;cuit")
     s.add_argument("csv")
@@ -91,7 +91,7 @@ def main(argv=None):
     if a.cmd == "proveedores":
         print(f"{db.cargar_padron(con, a.csv)} proveedores en el padrón.")
     elif a.cmd == "procesar":
-        extractor = ExtractorDemo(EJEMPLOS / "extracciones") if a.demo else ExtractorClaude(a.modelo)
+        extractor = ExtractorDemo(EJEMPLOS / "extracciones") if a.demo else ExtractorLLM(a.modelo)
         _imprimir(procesar_carpeta(con, Path(a.entrada), extractor, Path(a.mover) if a.mover else None))
     elif a.cmd == "pendientes":
         docs = [d for d in db.documentos_completos(con) if d["estado"] == "pendiente"]
