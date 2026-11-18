@@ -1,0 +1,34 @@
+{
+  "tipo": "remito",
+  "proveedor": "Bebidas Norte",
+  "cuit": null,
+  "numero": "0002-00004410",
+  "fecha": "2026-11-05",
+  "items": [
+    {
+      "descripcion": "Gaseosa cola 2,25 L",
+      "cantidad": 24,
+      "unidad": "botella",
+      "precio_unitario": 2100,
+      "subtotal": 50400
+    },
+    {
+      "descripcion": "Agua mineral 2 L",
+      "cantidad": 24,
+      "unidad": "botella",
+      "precio_unitario": 700,
+      "subtotal": 16800
+    },
+    {
+      "descripcion": "Cerveza lata 473 ml",
+      "cantidad": 48,
+      "unidad": "lata",
+      "precio_unitario": 1100,
+      "subtotal": 52800
+    }
+  ],
+  "subtotal": null,
+  "impuestos": null,
+  "total": 120000,
+  "observaciones": null
+}

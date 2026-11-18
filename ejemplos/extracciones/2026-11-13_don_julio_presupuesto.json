@@ -1,0 +1,27 @@
+{
+  "tipo": "presupuesto",
+  "proveedor": "Panificados Don Julio",
+  "cuit": null,
+  "numero": null,
+  "fecha": "2026-11-13",
+  "items": [
+    {
+      "descripcion": "Pan francés",
+      "cantidad": 30,
+      "unidad": "kg",
+      "precio_unitario": 1600,
+      "subtotal": 48000
+    },
+    {
+      "descripcion": "Facturas",
+      "cantidad": 10,
+      "unidad": "docena",
+      "precio_unitario": 3100,
+      "subtotal": 31000
+    }
+  ],
+  "subtotal": null,
+  "impuestos": null,
+  "total": 79000,
+  "observaciones": "Precios válidos hasta el 30/11/2026; entrega diaria antes de las 7."
+}

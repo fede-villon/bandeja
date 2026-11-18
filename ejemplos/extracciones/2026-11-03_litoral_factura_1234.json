@@ -1,0 +1,41 @@
+{
+  "tipo": "factura",
+  "proveedor": "Distribuidora Del Litoral S.A.",
+  "cuit": "30-71234567-8",
+  "numero": "0003-00001234",
+  "fecha": "2026-11-03",
+  "items": [
+    {
+      "descripcion": "Yerba mate 1 kg",
+      "cantidad": 24,
+      "unidad": "unidad",
+      "precio_unitario": 3900,
+      "subtotal": 93600
+    },
+    {
+      "descripcion": "Azúcar 1 kg",
+      "cantidad": 30,
+      "unidad": "unidad",
+      "precio_unitario": 1100,
+      "subtotal": 33000
+    },
+    {
+      "descripcion": "Fideos tallarín 500 g",
+      "cantidad": 40,
+      "unidad": "unidad",
+      "precio_unitario": 950,
+      "subtotal": 38000
+    },
+    {
+      "descripcion": "Aceite girasol 1,5 L",
+      "cantidad": 12,
+      "unidad": "unidad",
+      "precio_unitario": 2600,
+      "subtotal": 31200
+    }
+  ],
+  "subtotal": 195800,
+  "impuestos": 41118.0,
+  "total": 236918.0,
+  "observaciones": null
+}

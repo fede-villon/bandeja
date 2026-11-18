@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bandeja · Revisión de comprobantes</title>
+<style>
+:root {
+  --fondo: #f5f6f8; --papel: #fff; --tinta: #1b2130; --tenue: #687083; --linea: #e3e6ec;
+  --acento: #2b3a67; --acento-suave: #e8ecf7; --rojo: #b3261e; --rojo-suave: #fcebea;
+  --ambar: #8a5a00; --ambar-suave: #fdf3dc; --verde: #1f6b45; --verde-suave: #e5f3eb; --azul-suave: #e9f1fb;
+  --radio: 10px; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, sans-serif; color: var(--tinta);
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--fondo); font-size: 15px; line-height: 1.45; }
+header { background: var(--acento); color: #fff; padding: 14px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.logo { width: 30px; height: 30px; border-radius: 8px; background: #fff; color: var(--acento); display: grid; place-items: center; font-weight: 800; }
+header h1 { font-size: 1.1rem; margin: 0; }
+header p { margin: 0; color: #c9d0e4; font-size: .9rem; }
+.demo { background: var(--ambar-suave); color: var(--ambar); padding: 8px 24px; font-size: .88rem; border-bottom: 1px solid #f1dfb0; }
+main { max-width: 1240px; margin: 0 auto; padding: 22px 24px 48px; }
+.metricas { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.metrica { background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); padding: 12px 16px; }
+.metrica span { display: block; color: var(--tenue); font-size: .82rem; }
+.metrica strong { font-size: 1.45rem; font-variant-numeric: tabular-nums; }
+.metrica.alta strong { color: var(--rojo); }
+.filtros { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+.filtros button { font: inherit; border: 1px solid var(--linea); background: var(--papel); padding: 6px 12px; border-radius: 99px; cursor: pointer; color: var(--tinta); }
+.filtros button.activo { background: var(--acento); border-color: var(--acento); color: #fff; }
+.grilla { display: grid; grid-template-columns: 380px 1fr; gap: 18px; align-items: start; }
+.lista { display: flex; flex-direction: column; gap: 8px; }
+.tarjeta { background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); padding: 12px 14px; cursor: pointer; text-align: left; font: inherit; color: inherit; width: 100%; }
+.tarjeta:hover { border-color: #b9c2d8; }
+.tarjeta.sel { border-color: var(--acento); box-shadow: 0 0 0 2px var(--acento-suave); }
+.tarjeta .fila { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.tarjeta .prov { font-weight: 650; }
+.tarjeta .monto { font-variant-numeric: tabular-nums; font-weight: 650; }
+.tarjeta .meta { color: var(--tenue); font-size: .84rem; margin-top: 2px; }
+.chips { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 8px; }
+.chip { font-size: .74rem; font-weight: 650; padding: 2px 8px; border-radius: 99px; }
+.chip.alta { background: var(--rojo-suave); color: var(--rojo); }
+.chip.media { background: var(--ambar-suave); color: var(--ambar); }
+.chip.info { background: var(--azul-suave); color: var(--acento); }
+.chip.aprobado { background: var(--verde-suave); color: var(--verde); }
+.chip.rechazado { background: #eee; color: #555; }
+.chip.pendiente { background: var(--acento-suave); color: var(--acento); }
+.detalle { background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); padding: 20px 22px; position: sticky; top: 14px; }
+.detalle h2 { margin: 0 0 2px; font-size: 1.3rem; }
+.detalle .sub { color: var(--tenue); margin: 0 0 14px; }
+.datos { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px 18px; margin: 0 0 18px; }
+.datos dt { color: var(--tenue); font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; }
+.datos dd { margin: 0; font-weight: 550; font-variant-numeric: tabular-nums; }
+.alertas { list-style: none; padding: 0; margin: 0 0 18px; display: flex; flex-direction: column; gap: 6px; }
+.alertas li { padding: 9px 12px; border-radius: 8px; border-left: 4px solid; }
+.alertas li.alta { background: var(--rojo-suave); border-color: var(--rojo); }
+.alertas li.media { background: var(--ambar-suave); border-color: #d9a420; }
+.alertas li.info { background: var(--azul-suave); border-color: #7f9bd1; }
+.ok { background: var(--verde-suave); color: var(--verde); padding: 9px 12px; border-radius: 8px; margin: 0 0 18px; }
+table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--linea); }
+th { font-size: .76rem; color: var(--tenue); text-transform: uppercase; letter-spacing: .04em; }
+.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+tfoot td { font-weight: 700; border-bottom: 0; }
+.acciones { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.btn { font: inherit; font-weight: 600; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--linea); background: #fff; color: var(--tinta); cursor: pointer; text-decoration: none; }
+.btn.aprobar { background: var(--verde); border-color: var(--verde); color: #fff; }
+.btn.rechazar { color: var(--rojo); border-color: #efc4c0; }
+.cmd { color: var(--tenue); font-size: .82rem; }
+code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .85em; background: #f0f2f6; padding: 1px 5px; border-radius: 4px; }
+.vacio { color: var(--tenue); padding: 30px; text-align: center; }
+details { margin-top: 14px; } summary { cursor: pointer; color: var(--tenue); font-size: .88rem; }
+pre { background: #0f1422; color: #d7deef; padding: 12px; border-radius: 8px; overflow: auto; font-size: .8rem; }
+@media (max-width: 900px) { .grilla { grid-template-columns: 1fr; } .detalle { position: static; } main { padding: 16px; } header, .demo { padding-left: 16px; padding-right: 16px; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">B</div>
+  <div><h1>Bandeja</h1><p>Comprobantes de proveedores leídos con IA y verificados automáticamente</p></div>
+</header>
+<div class="demo" id="aviso">Demo con datos de ejemplo. Aprobar o rechazar solo se guarda en tu navegador.</div>
+<main>
+  <section class="metricas" id="metricas"></section>
+  <nav class="filtros" id="filtros"></nav>
+  <div class="grilla">
+    <div class="lista" id="lista"></div>
+    <section class="detalle" id="detalle"><p class="vacio">Elegí un comprobante.</p></section>
+  </div>
+</main>
+<script id="datos" type="application/json">__DATOS__</script>
+<script>
+const DATOS = JSON.parse(document.getElementById('datos').textContent);
+const docs = DATOS.documentos;
+const CLAVE = 'bandeja-estados';
+let cambios = {};
+try { cambios = JSON.parse(localStorage.getItem(CLAVE) || '{}'); } catch (e) {}
+const estado = d => cambios[d.id] || d.estado;
+const pesos = n => '$' + Number(n || 0).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const fecha = f => f ? f.split('-').reverse().join('/') : '—';
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const gravedadMax = d => d.alertas.some(a => a.gravedad === 'alta') ? 'alta' : d.alertas.some(a => a.gravedad === 'media') ? 'media' : null;
+const TIPOS = { total: 'Total no cierra', linea: 'Línea mal calculada', duplicado: 'Duplicado', aumento: 'Aumento', proveedor_nuevo: 'Proveedor nuevo', dato_faltante: 'Faltan datos', revisar: 'Revisar' };
+const FILTROS = [['todos', 'Todos', () => true], ['alertas', 'Con alertas', d => gravedadMax(d)], ['pendiente', 'Pendientes', d => estado(d) === 'pendiente'], ['aprobado', 'Aprobados', d => estado(d) === 'aprobado'], ['rechazado', 'Rechazados', d => estado(d) === 'rechazado']];
+let filtro = 'todos', seleccionado = null;
+
+function metricas() {
+  const validos = docs.filter(d => ['factura', 'remito'].includes(d.tipo) && estado(d) !== 'rechazado' && !d.alertas.some(a => a.tipo === 'duplicado'));
+  const altas = docs.filter(d => gravedadMax(d) === 'alta' && estado(d) === 'pendiente').length;
+  document.getElementById('metricas').innerHTML = [
+    ['Comprobantes', docs.length, ''], ['Total comprado', pesos(validos.reduce((s, d) => s + d.total, 0)), ''],
+    ['Alertas graves sin resolver', altas, altas ? 'alta' : ''], ['Pendientes de aprobar', docs.filter(d => estado(d) === 'pendiente').length, ''],
+  ].map(([t, v, c]) => `<div class="metrica ${c}"><span>${t}</span><strong>${v}</strong></div>`).join('');
+}
+function filtros() {
+  document.getElementById('filtros').innerHTML = FILTROS.map(([k, t, f]) =>
+    `<button class="${k === filtro ? 'activo' : ''}" data-f="${k}">${t} (${docs.filter(f).length})</button>`).join('');
+}
+function lista() {
+  const f = FILTROS.find(x => x[0] === filtro)[2];
+  const vis = docs.filter(f);
+  document.getElementById('lista').innerHTML = vis.length ? vis.map(d => {
+    const chips = [...new Set(d.alertas.map(a => a.gravedad + '|' + a.tipo))].map(k => { const [g, t] = k.split('|'); return `<span class="chip ${g}">${TIPOS[t] || t}</span>`; }).join('');
+    return `<button class="tarjeta ${d.id === seleccionado ? 'sel' : ''}" data-id="${d.id}">
+      <div class="fila"><span class="prov">${esc(d.proveedor)}</span><span class="monto">${pesos(d.total)}</span></div>
+      <div class="meta">${esc(d.tipo)} ${esc(d.numero || '')} · ${fecha(d.fecha)}</div>
+      <div class="chips"><span class="chip ${estado(d)}">${estado(d)}</span>${chips}</div></button>`;
+  }).join('') : '<p class="vacio">No hay comprobantes en este filtro.</p>';
+}
+function detalle() {
+  const d = docs.find(x => x.id === seleccionado);
+  const el = document.getElementById('detalle');
+  if (!d) { el.innerHTML = '<p class="vacio">Elegí un comprobante.</p>'; return; }
+  const suma = d.items.reduce((s, i) => s + i.subtotal, 0);
+  el.innerHTML = `
+    <h2>${esc(d.proveedor)}</h2>
+    <p class="sub">${esc(d.tipo)} ${esc(d.numero || '')} · archivo <code>${esc(d.archivo)}</code></p>
+    <dl class="datos">
+      <div><dt>Fecha</dt><dd>${fecha(d.fecha)}</dd></div><div><dt>CUIT</dt><dd>${esc(d.cuit || '—')}</dd></div>
+      <div><dt>Impuestos</dt><dd>${d.impuestos != null ? pesos(d.impuestos) : '—'}</dd></div><div><dt>Total impreso</dt><dd>${pesos(d.total)}</dd></div>
+      <div><dt>Estado</dt><dd>${estado(d)}</dd></div><div><dt>Leído por</dt><dd>${esc(d.extractor)}</dd></div>
+    </dl>
+    ${d.alertas.length ? `<ul class="alertas">${d.alertas.map(a => `<li class="${a.gravedad}"><strong>${TIPOS[a.tipo] || a.tipo}.</strong> ${esc(a.mensaje)}</li>`).join('')}</ul>` : '<p class="ok">Todos los controles dieron bien.</p>'}
+    <table><thead><tr><th>Descripción</th><th class="num">Cant.</th><th class="num">Precio</th><th class="num">Subtotal</th></tr></thead>
+      <tbody>${d.items.map(i => `<tr><td>${esc(i.descripcion)}</td><td class="num">${i.cantidad} ${esc(i.unidad || '')}</td><td class="num">${pesos(i.precio_unitario)}</td><td class="num">${pesos(i.subtotal)}</td></tr>`).join('')}</tbody>
+      <tfoot><tr><td colspan="3">Suma de líneas</td><td class="num">${pesos(suma)}</td></tr></tfoot></table>
+    <div class="acciones">
+      <button class="btn aprobar" data-accion="aprobado">Aprobar para pago</button>
+      <button class="btn rechazar" data-accion="rechazado">Rechazar</button>
+      ${d.original ? `<a class="btn" href="${esc(d.original)}" target="_blank" rel="noopener">Ver original</a>` : ''}
+      <span class="cmd">En la terminal: <code>bandeja aprobar ${d.id}</code></span>
+    </div>
+    <details><summary>Datos extraídos (JSON)</summary><pre>${esc(JSON.stringify(d.datos, null, 2))}</pre></details>`;
+}
+function todo() { metricas(); filtros(); lista(); detalle(); }
+document.addEventListener('click', e => {
+  const f = e.target.closest('[data-f]'); if (f) { filtro = f.dataset.f; todo(); return; }
+  const t = e.target.closest('.tarjeta'); if (t) { seleccionado = Number(t.dataset.id); todo(); if (innerWidth < 900) document.getElementById('detalle').scrollIntoView({ behavior: 'smooth' }); return; }
+  const a = e.target.closest('[data-accion]');
+  if (a && seleccionado != null) { cambios[seleccionado] = a.dataset.accion; try { localStorage.setItem(CLAVE, JSON.stringify(cambios)); } catch (e) {} todo(); }
+});
+if (!DATOS.demo) document.getElementById('aviso').remove();
+const primero = docs.find(d => gravedadMax(d) === 'alta') || docs[0];
+seleccionado = primero ? primero.id : null;
+todo();
+</script>
+</body>
+</html>

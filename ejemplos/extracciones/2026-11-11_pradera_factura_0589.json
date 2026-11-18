@@ -1,0 +1,34 @@
+{
+  "tipo": "factura",
+  "proveedor": "Lácteos La Pradera S.R.L.",
+  "cuit": "30-70987654-3",
+  "numero": "0001-00000589",
+  "fecha": "2026-11-11",
+  "items": [
+    {
+      "descripcion": "Leche entera 1 L",
+      "cantidad": 48,
+      "unidad": "unidad",
+      "precio_unitario": 900,
+      "subtotal": 43200
+    },
+    {
+      "descripcion": "Queso cremoso 1 kg",
+      "cantidad": 5,
+      "unidad": "kg",
+      "precio_unitario": 6200,
+      "subtotal": 31000
+    },
+    {
+      "descripcion": "Crema de leche 200 ml",
+      "cantidad": 24,
+      "unidad": "unidad",
+      "precio_unitario": 1100,
+      "subtotal": 26400
+    }
+  ],
+  "subtotal": 100600,
+  "impuestos": 21126.0,
+  "total": 123726.0,
+  "observaciones": null
+}

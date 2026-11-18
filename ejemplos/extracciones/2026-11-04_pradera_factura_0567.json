@@ -1,0 +1,34 @@
+{
+  "tipo": "factura",
+  "proveedor": "Lácteos La Pradera S.R.L.",
+  "cuit": "30-70987654-3",
+  "numero": "0001-00000567",
+  "fecha": "2026-11-04",
+  "items": [
+    {
+      "descripcion": "Leche entera 1 L",
+      "cantidad": 48,
+      "unidad": "unidad",
+      "precio_unitario": 900,
+      "subtotal": 43200
+    },
+    {
+      "descripcion": "Yogur bebible 1 L",
+      "cantidad": 12,
+      "unidad": "unidad",
+      "precio_unitario": 1300,
+      "subtotal": 15600
+    },
+    {
+      "descripcion": "Manteca 200 g",
+      "cantidad": 20,
+      "unidad": "unidad",
+      "precio_unitario": 1600,
+      "subtotal": 32000
+    }
+  ],
+  "subtotal": 90800,
+  "impuestos": 19068.0,
+  "total": 109868.0,
+  "observaciones": null
+}
